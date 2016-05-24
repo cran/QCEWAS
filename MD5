@@ -1,0 +1,14 @@
+30a079bf8c9710ac0abc50ac8f1ceced *DESCRIPTION
+32fb9ee2ad2803032f6c85636b826c0b *NAMESPACE
+5bbc01c2651aa99c580813561f66c3ea *R/script_v10-6_package.R
+65b773e70a08d23c08dc1f8518fe3954 *inst/extdata/sample1.txt.gz
+8f6229be82ef62705e6e17aba602ab17 *inst/extdata/sample2.txt.gz
+378cc67aa023e5b119e9832563a7685d *inst/extdata/sample_map.txt.gz
+47af759503240ccf4107dae7ef2e05c7 *inst/extdata/translation_table.txt
+cc0d6c0dfd406a8c42eb1faa74a4c385 *man/EWAS_QC.Rd
+53997e7a4261659bdad006b84e937e9c *man/EWAS_plots.Rd
+23b8079eb7aae58dac2e4fb1cf2b8dcb *man/EWAS_series.Rd
+8d115fb3fac3d3c385138c64d22d936b *man/P_correlation.Rd
+ac28000416dfef8297e0b82e3e4db078 *man/P_lambda.Rd
+2bc6ed161d32311db2530a3f594f9cb5 *man/QCEWAS-package.Rd
+80fbe2907b6a1c9602b35d21d3fdf967 *man/translate_header.Rd
