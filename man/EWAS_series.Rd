@@ -66,7 +66,7 @@ EWAS_series(EWAS_files,
   have been processed, it will generate two additional graphs: a
   precision plot (provided \code{N} was specified) and a
   beta-distribution plot. The former shows the distribution of
-  precision (\code{1 / median standard error}) against the
+  precision (1 / median standard error) against the
   square root of the sample size of the results file. Normally,
   one expects to see a roughly positive correlation (i.e. the
   cohorts ought to cluster around the linear diagonal from the
@@ -113,14 +113,18 @@ EWAS_series(EWAS_files,
   
 \dontrun{
 
-file.copy(from = file.path(system.file("extdata", package = "QCEWAS"), "sample_map.txt.gz"),
-               to = getwd(), overwrite = FALSE, recursive = FALSE)
-file.copy(from = file.path(system.file("extdata", package = "QCEWAS"), "sample1.txt.gz"),
-               to = getwd(), overwrite = FALSE, recursive = FALSE)
-file.copy(from = file.path(system.file("extdata", package = "QCEWAS"), "sample2.txt.gz"),
-               to = getwd(), overwrite = FALSE, recursive = FALSE)
-file.copy(from = file.path(system.file("extdata", package = "QCEWAS"), "translation_table.txt"),
-               to = getwd(), overwrite = FALSE, recursive = FALSE)
+file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
+                           "sample_map.txt.gz"),
+          to = getwd(), overwrite = FALSE, recursive = FALSE)
+file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
+                           "sample1.txt.gz"),
+          to = getwd(), overwrite = FALSE, recursive = FALSE)
+file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
+                           "sample2.txt.gz"),
+          to = getwd(), overwrite = FALSE, recursive = FALSE)
+file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
+                           "translation_table.txt"),
+          to = getwd(), overwrite = FALSE, recursive = FALSE)
 
 sample_list <- c("sample1.txt.gz", "sample2.txt.gz")
 sample_N <- data.frame(file = sample_list,

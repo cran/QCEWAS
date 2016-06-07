@@ -9,10 +9,10 @@
 }
 \details{
   \tabular{ll}{
-    Package: \tab QEGWAS\cr
+    Package: \tab QCEWAS\cr
     Type: \tab Package\cr
-    Version: \tab 1.0-6\cr
-    Date: \tab 2016-05-24\cr
+    Version: \tab 1.0-7\cr
+    Date: \tab 2016-05-26\cr
     License: \tab GPL (>= 3)\cr
   }
   When combining the results of multiple Epigenome-Wide

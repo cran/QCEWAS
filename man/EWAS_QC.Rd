@@ -217,10 +217,12 @@
   
 \dontrun{
 
-file.copy(from = file.path(system.file("extdata", package = "QCEWAS"), "sample_map.txt.gz"),
-               to = getwd(), overwrite = FALSE, recursive = FALSE)
-file.copy(from = file.path(system.file("extdata", package = "QCEWAS"), "sample1.txt.gz"),
-               to = getwd(), overwrite = FALSE, recursive = FALSE)
+file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
+                           "sample_map.txt.gz"),
+          to = getwd(), overwrite = FALSE, recursive = FALSE)
+file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
+                           "sample1.txt.gz"),
+          to = getwd(), overwrite = FALSE, recursive = FALSE)
 
 QC_results <- EWAS_QC(data = "sample1.txt.gz",
                       map = "sample_map.txt.gz",

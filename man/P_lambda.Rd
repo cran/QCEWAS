@@ -14,6 +14,7 @@ P_lambda(p)
 \details{
   The function removes any missing values from \code{p}, and then
   returns:
+  
   \code{median(qchisq(p, df=1, lower.tail=FALSE)) / qchisq(0.5, 1)}
   
   The lambda value represents the inflation of the p-values in a

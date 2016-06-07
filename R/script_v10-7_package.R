@@ -1,4 +1,4 @@
-# QCEWAS v1.0-5
+# QCEWAS v1.0-7
 # Created by Peter van der Most, April 2015 - May 2016 with samples
 # Based on code for the QCGWAS package
 
@@ -8,7 +8,7 @@
 
 
 .onAttach <- function(libname, pkgname) {
-  packageStartupMessage("QCEWAS library, version 1.0-6")
+  packageStartupMessage("QCEWAS library, version 1.0-7")
 }
 
 
@@ -706,7 +706,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   write.table(data.frame(
     v1 = c("File", "QC Start Time", "QC End Time", "EWAS_QC Version"),
     v2 = "",
-    v3 = c(outcome_QC$file, zv_startime, date(), "1.0-6"),
+    v3 = c(outcome_QC$file, zv_startime, date(), "1.0-7"),
     stringsAsFactors = FALSE),
     zc_log, quote = FALSE,
     sep = "\t", row.names = FALSE, col.names = FALSE)

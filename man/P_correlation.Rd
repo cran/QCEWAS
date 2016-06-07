@@ -23,7 +23,7 @@
     a data frame with the columns \code{BETA} (effect size),
     \code{SE} (standard error), and \code{P_VAL} (p value). If
     the column names differ from the above, the argument
-    \code{header_translations} can be used to translate them.
+    header_translations can be used to translate them.
 }
   \item{plot_correlation}{
     logical, determines whether a graph is made of reported vs.
