@@ -11,8 +11,8 @@
   \tabular{ll}{
     Package: \tab QCEWAS\cr
     Type: \tab Package\cr
-    Version: \tab 1.0-7\cr
-    Date: \tab 2016-05-26\cr
+    Version: \tab 1.0-8\cr
+    Date: \tab 2016-10-03\cr
     License: \tab GPL (>= 3)\cr
   }
   When combining the results of multiple Epigenome-Wide
@@ -37,6 +37,9 @@
   \code{\link{P_correlation}} are subroutines of
   \code{\link{EWAS_QC}} that can also be called by the user to
   perform specific QC tasks.
+  
+  QCEWAS also includes a Quick-Start Guide. A link to the
+  guide is provided when the package is loaded into R.
 }
 \author{
 P.J. van der Most, Leanne K. Kupers and Ilja M. Nolte

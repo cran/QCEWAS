@@ -4,9 +4,7 @@
 \description{
   This function is used to translate non-standard column names
   into the standard ones used by \code{\link{EWAS_QC}} and other
-  functions. It can also translate the standard names into
-  user-specified names (via the \code{header_final_dataset} argument of
-  \code{\link{EWAS_QC}}).
+  functions.
 }
 \usage{
   translate_header(header,
@@ -17,7 +15,7 @@
   \item{header}{character vector; the header to be translated.}
   \item{standard}{character vector; the names \code{header}
     should be translated into.}
-  \item{alternative}{translation table; see 'Details' for more information.}
+  \item{alternative}{translation table; see below for more information.}
 }
 \details{
   The function takes the entries in \code{standard} one by one, and
@@ -45,7 +43,7 @@
     in the standard argument) in the first column, and the
     alternatives in the second.
     \item Multiple alternatives are allowed for a single standard
-    name, but every alternative name must have its row.
+    name, but every alternative name must be in a separate row.
     \item The alternatives must be capitalized.
     \item No duplicate alternatives are allowed.
     \item A header line is not required, and will be ignored if present.
@@ -62,8 +60,6 @@
 # For use in this example, the 2 sample files in the
 # extdata folder of the QCEWAS library will be copied
 # to your current R working directory
-  
-\dontrun{
 
 file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
                            "sample2.txt.gz"),
@@ -86,5 +82,5 @@ sample_translation
 colnames(sample_ewas) <- sample_translation$header_h
 
 colnames(sample_ewas)
-}
+
 }

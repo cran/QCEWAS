@@ -2,9 +2,9 @@
 \alias{EWAS_QC}
 \title{Automated Quality Control of EWAS results files}
 \description{
-    The main function of the \code{\link{QCEWAS}} package.
+    The main function of the \link{QCEWAS} package.
     \code{EWAS_QC} accepts a single EWAS results file and runs a
-    thorough quality check (including data integrity),
+    thorough quality check (QC),
     optionally applies various filters and generates QQ, Volcano
     and Manhattan plots. The function \code{\link{EWAS_series}}
     can be used to process multiple results files sequentially.
@@ -15,10 +15,12 @@
           outputname,
           header_translations,
           threshold_outliers = c(NA, NA),
+          markers_to_exclude,
           exclude_outliers = FALSE,
           exclude_X = FALSE, exclude_Y = FALSE,
           save_final_dataset = TRUE, gzip_final_dataset = TRUE,
           header_final_dataset = "standard",
+          high_quality_plots = FALSE,
           return_beta = FALSE, N_return_beta = 500000L,
           ...)
 }
@@ -36,7 +38,7 @@
     including files compressed in the .gz format. \code{EWAS_QC}
     will pass any named, unknown arguments to
     \code{\link{read.table}}, so you can specify the column
-    separator and NA string in \code{EWAS_QC} with the usual
+    separator and NA string with the usual
      \code{\link{read.table}} arguments. (Note that this only
      applied to importing the EWAS results, and not the map or
      translation files.)
@@ -49,7 +51,7 @@
     filters. \code{map}	must include the columns \code{PROBEID},
     \code{CHR} (chromosome), and \code{POS} (position), using
     those exact names. Other columns may be included but will be
-    ignored. f a filename is entered in this argument, it
+    ignored. If a filename is entered in this argument, it
     will be imported via the \code{\link{read.table}} function.
     \code{\link{read.table}} can handle a variety of formats,
     including files compressed in the .gz format.
@@ -77,6 +79,19 @@
     respective value is set to \code{NA}. To skip the check
     entirely, set this argument to \code{c(NA, NA)}.
 }
+  \item{markers_to_exclude}{
+    Either a vector or data frame containing a list of CpG IDs
+    that need to be excluded before starting the QC (in case of
+    a data frame only the first column will be processed), or
+    the name of a file containing the same. This argument is
+    optional: if not specified, no exclusions are made. Note
+    that when a single value (a vector of length 1) is
+    passed to this argument, \code{EWAS_QC} will treat it as a
+    filename even when no such file can be found. If you want
+    to remove a single CpG, either pass it to this argument
+    via a file, or add a dummy value to the vector to give it
+    length 2 (e.g. \code{c("cg02198983", "dummy")} ).
+}
   \item{exclude_outliers}{
     a logical value determining how outliers are treated. If
     \code{TRUE}, they are excluded from the final dataset. If
@@ -85,7 +100,8 @@
   \item{exclude_X, exclude_Y}{
     logical values determining whether markers at the X and Y
     chromosome respectively are excluded from the final dataset.
-    This requires a \code{map} to be specified.
+    This requires providing a map to \code{EWAS_QC} via the
+    \code{map} argument.
 }
   \item{save_final_dataset}{
     logical determining whether the cleaned dataset will be
@@ -107,6 +123,10 @@
     \code{BETA}, \code{SE}, and \code{P_VAL}) must be in the
     second column, and the desired column names in the first.
 }
+  \item{high_quality_plots}{
+    logical. Setting this to TRUE will save the graphs as 
+    high-resolution tiff images.
+}
   \item{return_beta, N_return_beta}{
     arguments used by \code{\link{EWAS_series}}. These are not
     important for users and can be ignored. For the sake of
@@ -121,7 +141,12 @@
 }
 }
 \details{
-  The Quality Control has the following 5 stages:
+  \code{QCEWAS} includes a Quick-Start guide in the doc
+  folder of the library. This guide will explain how to
+  run a QC and how to interpret the results.
+  The start-up message when loading
+  \code{QCEWAS} will indicate where it can be found on your
+  computer. In brief, the QC consists of the following 5 stages:
   
     \itemize{
     \item Checking data integrity:
@@ -134,7 +159,8 @@
     \item Filter for outliers and sex-chromosomes (optional)
     
     Counts the number of outlying markers, as well as chromosome
-    X and Y markers, and deletes them if specified.
+    X and Y markers, and deletes them if specified. The markers
+    named in \code{markers_to_exclude} are removed here as well.
     
     \item Generating QC plots
     
@@ -212,10 +238,8 @@
 # to your current R working directory. Running the QC
 # generates 7 new files in your working directory:
 # a cleaned, post-QC dataset, a log file, and 5 graphs.
-# Consult the manual for more information on how to
-# interpret these.
-  
-\dontrun{
+# Consult the Quick-Start guide for more information on
+# how to interpret these.
 
 file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
                            "sample_map.txt.gz"),
@@ -232,5 +256,4 @@ QC_results <- EWAS_QC(data = "sample1.txt.gz",
                       exclude_X = TRUE, exclude_Y = FALSE,
                       save_final_dataset = TRUE, gzip_final_dataset = FALSE)
 
-}
 }

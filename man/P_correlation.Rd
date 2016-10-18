@@ -2,7 +2,7 @@
 \alias{P_correlation}
 \title{Testing P-value distribution}
 \description{
-  A sub-function of \code{\link{EWAS_QC}}, \code{P_correlation}
+  A sub-function of \code{\link{EWAS_QC}} that
   tests if the reported p-values match the p-value that can be
   derived from the effect-size and standard error values.
   Aberrations between these indicate that the p-values have been
@@ -15,6 +15,7 @@
                 plot_correlation = TRUE,
                 plot_if_threshold = FALSE,
                 threshold_r = 0.99,
+                high_quality_plots = FALSE,
                 save_name = "dataset",
                 header_translations, ...)
 }
@@ -37,6 +38,10 @@
     numeric. If the p-value correlation is below this, a warning
     is generated.
 }
+  \item{high_quality_plots}{
+    logical. Setting this to TRUE will save the graph as a 
+    high-resolution tiff image.
+}
   \item{save_name}{
     character string used for the output file. Do not add an
     extension; \code{P_correlation} will do so automatically.
@@ -46,7 +51,7 @@
     \code{\link{translate_header}} for details.
 }
   \item{\dots}{
-    arguments passed to the generic R \code{\link{plot}} function.
+    arguments passed to the generic \code{\link{plot}} function.
 }
 }
 \details{

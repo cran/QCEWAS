@@ -2,6 +2,6 @@ export(EWAS_plots, EWAS_QC, EWAS_series, P_correlation, P_lambda, translate_head
 importFrom(utils, flush.console, read.table, write.table) 
 importFrom(stats, cor, median, pchisq, ppoints, qbeta,
            qchisq, quantile)
-importFrom(grDevices, dev.off, palette, png)
+importFrom(grDevices, dev.off, palette, png, tiff)
 importFrom(graphics, abline, axis, boxplot, hist, lines,
            mtext, par, plot, points, polygon, text)

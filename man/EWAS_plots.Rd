@@ -6,7 +6,7 @@
   quantile-quantile (QQ) and Manhattan plots. It can also be
   called by users. Note that it does not generate the histogram
   or volcano plot - this is done by \code{\link{EWAS_QC}}
-  itself).
+  itself.
 }
 \usage{
   EWAS_plots(dataset,
@@ -14,6 +14,7 @@
              plot_Man = TRUE,
              plot_cutoff_p = 0.05,
              plot_QQ_bands = FALSE,
+             high_quality_plots = FALSE,
              save_name = "dataset",
              header_translations)
 }
@@ -38,13 +39,17 @@
     numeric: the threshold of p-values to be shown in the QQ and
     Manhattan plots. Higher (less significant) p-values are
     excluded from the plot. The default setting is 0.05, which
-    excludes 95\% of data-points. It's not recommended to
+    excludes 95\% of data-points. It's \emph{NOT} recommended to
     increase the value above 0.05, as this may dramatically
     increase running time and memory usage.
 }
   \item{plot_QQ_bands}{
     logical, if \code{TRUE}, probability bands are added to the
     QQ plot.
+}
+  \item{high_quality_plots}{
+    logical. Setting this to TRUE will save the graphs as 
+    high-resolution tiff images.
 }
   \item{save_name}{
     character string, the name used for the plot files (do not
@@ -60,7 +65,8 @@
 \details{
   \code{EWAS_plots} is a fairly straightforward function. It
   accepts a data table or a vector of p-values, and generates
-  QQ and Manhattan plots from these.
+  QQ and (when chromosome and position data are included)
+  Manhattan plots from these.
 }
 \value{
   \code{EWAS_plots}' most important output are the two graphs.

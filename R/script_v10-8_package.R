@@ -1,5 +1,5 @@
-# QCEWAS v1.0-7
-# Created by Peter van der Most, April 2015 - May 2016 with samples
+# QCEWAS v1.0-8
+# Created by Peter van der Most, April 2015 - Oktober 2016 with samples
 # Based on code for the QCGWAS package
 
 
@@ -7,9 +7,12 @@
 # don't export the zf_testLogical function
 
 
-.onAttach <- function(libname, pkgname) {
-  packageStartupMessage("QCEWAS library, version 1.0-7")
-}
+  .onAttach <- function(libname, pkgname) {
+    packageStartupMessage("")
+    packageStartupMessage("QCEWAS library, version 1.0-8")
+    packageStartupMessage(paste0("A Quick Start Guide can be found in", system.file("doc", package = "QCEWAS")))
+    packageStartupMessage("")
+  }
 
 
 # zf_testLogical is an internal function to test if arguments are logical
@@ -23,6 +26,7 @@ zf_testLogical <- function(param, notNA = TRUE){
 # Function P_correlation is no longer the same check_p as in QCGWAS. The save name has been changed, the log entries & HQ subset removed and the colnames have been updated
 P_correlation <- function(dataset,
                     plot_correlation = TRUE, plot_if_threshold = FALSE, threshold_r = 0.99,
+                    high_quality_plots = FALSE,
                     save_name = "dataset", header_translations, ...) {
   
   if(!missing(header_translations)) {
@@ -54,8 +58,13 @@ P_correlation <- function(dataset,
     }
     if(plot_correlation & (p_cor < threshold_r | !plot_if_threshold )) {
       p_max <- max(p_obs, p_exp)
-      png(paste0(save_name, ".graph_p.png"),
-          width = 720, height = 720, res = 144)
+      if(high_quality_plots){
+        tiff(filename = paste0(save_name, ".graph_p.tiff"), units = "in", width = 7, height = 7, res = 350,
+             compression = "lzw")
+      } else {
+        png(paste0(save_name, ".graph_p.png"),
+            width = 720, height = 720, res = 144)
+      }
       plot(x = 0, y = 0, col = "white",
            xlim = c(0, p_max), ylim = c(0, p_max),
            main="P-value correlation", xlab = "Expected -log10(p)", ylab = "Observed -log10(p)",
@@ -88,10 +97,17 @@ P_lambda <- function(p){
 EWAS_plots <- function(dataset, plot_QQ = TRUE, plot_Man = TRUE,
                      plot_cutoff_p = 0.05,
                      plot_QQ_bands = FALSE,
+                     high_quality_plots = FALSE,
                      save_name = "dataset",
                      header_translations) {
   
-  if(is.vector(dataset)) { dataset <- data.frame(P_VAL = dataset) }
+  if(is.vector(dataset)) {
+    dataset <- data.frame(P_VAL = dataset)
+    if(plot_Man){
+      plot_Man <- FALSE
+      warning("Cannot create a Manhattan plot without chromosome/position values")
+    }
+  }
   colnames(dataset) <- toupper(colnames(dataset))
   header_std <- c("P_VAL", "CHR", "POS")[c(TRUE, plot_Man, plot_Man)]
   
@@ -160,8 +176,14 @@ EWAS_plots <- function(dataset, plot_QQ = TRUE, plot_Man = TRUE,
       QQ_exp <- QQ_exp[i1000]
     }
     
-    png(paste0(save_name, ".graph_QQ.png"),
-        width = 720, height = 720, res = 144)
+    
+    if(high_quality_plots){
+      tiff(filename = paste0(save_name, ".graph_QQ.tiff"), units = "in", width = 7, height = 7, res = 350,
+           compression = "lzw")
+    } else {
+      png(paste0(save_name, ".graph_QQ.png"),
+          width = 720, height = 720, res = 144)
+    }
     plot(c(QQ_exp_min, QQ_exp_max), c(QQ_obs_min, QQ_obs_max), xlim = c(0, QQ_exp_max), ylim = c(0, QQ_obs_max),
          main = "QQ plot", xlab = "Expected -log10(p-value)", ylab = "Observed -log10(p-value)",
          pch = 1, col = "black", sub = save_name, cex.sub = 1.3)
@@ -240,8 +262,13 @@ EWAS_plots <- function(dataset, plot_QQ = TRUE, plot_Man = TRUE,
       manMax <- ceiling(-log10(min(man_set$P_VAL)))
       if(manMax < 10L) manMax <- 10L
       
-      png(paste0(save_name, ".graph_M.png"),
-          width = 960, height = 480)
+      if(high_quality_plots){
+        tiff(filename = paste0(save_name, ".graph_M.tiff"), units = "in", width = 14, height = 7, res = 350,
+             compression = "lzw")
+      } else {
+        png(paste0(save_name, ".graph_M.png"),
+            width = 960, height = 480)
+      }
       par(mfrow = c(1,1), mgp = c(2.5, 0.9, 0))
       palette(c("red", "green3", "blue", "cyan"))
       plot(new_pos, -log10(man_set$P_VAL), pch = 20, xaxs = "i", xaxt = "n", ylim = c(1, manMax),
@@ -286,12 +313,14 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
                     outputname, # characterstring to identify dataset in output
                     header_translations, # translation table for file headers
                     threshold_outliers = c(NA, NA),
+                    markers_to_exclude,
                     exclude_outliers = FALSE,
                     exclude_X = FALSE,
                     exclude_Y = FALSE,
                     save_final_dataset = TRUE,
                     gzip_final_dataset = TRUE,
                     header_final_dataset = "standard",
+                    high_quality_plots = FALSE,
                     return_beta = FALSE,
                     N_return_beta = 500000L,
                     ...){
@@ -309,8 +338,8 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
     return(value)
   }
 
-  outcome_QC <- integer(8L)
-  names(outcome_QC) <- c("input", "unusable", "chrX", "chrY", "below_lower_limit", "above_upper_limit", "removed", "final")
+  outcome_QC <- integer(9L)
+  names(outcome_QC) <- c("input", "unusable", "removed_at_request", "chrX", "chrY", "below_lower_limit", "above_upper_limit", "removed", "final")
   outcome_QC <- list(data_input = "",
                      file = "",
                      QC_success = FALSE,
@@ -329,6 +358,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   
   use_outliers <- !all(is.na(threshold_outliers))
   if(use_outliers){
+    if(!is.numeric(threshold_outliers)) stop("'threshold_outliers' is not numeric")
     if(threshold_outliers[1] > threshold_outliers[2] & !is.na(threshold_outliers[1]) & !is.na(threshold_outliers[2])) {
       threshold_outliers <- threshold_outliers[2:1]
     }
@@ -341,10 +371,26 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   if(!zf_testLogical(exclude_Y)) stop("'exclude_Y' is not a single logical value")
   if((exclude_X | exclude_Y) & !use_map) stop("No map has been specified to exclude X or Y chromosome markers")
 
-  # 0: Checking save_final_dataset & return_beta
+  # 0: checking markers to exclude
+  use_MTE <- if(missing(markers_to_exclude)) FALSE else !is.null(markers_to_exclude)
+  if(use_MTE){
+    if(is.character(markers_to_exclude) & length(markers_to_exclude) == 1L) {
+      if(file.exists(markers_to_exclude)){ markers_to_exclude <- read.table(markers_to_exclude, header = F, stringsAsFactors = FALSE)
+      } else { stop("Cannot find a file with the name specified in 'markers_to_exclude'")}
+    }
+    if(is.data.frame(markers_to_exclude)){ markers_to_exclude <- markers_to_exclude[,1]
+    } else {
+      if(!is.vector(markers_to_exclude)) stop("'markers_to_exclude' is not a vector or filename of a file containing a vector")
+    }
+    markers_to_exclude <- markers_to_exclude[!is.na(markers_to_exclude)]
+    if(length(markers_to_exclude) == 0L) stop("'markers_to_exclude' contains no non-missing values")
+  }
+  
+  # 0: Checking save_final_dataset, return_beta & high_quality_plots
   if(!zf_testLogical(save_final_dataset)) stop("'save_final_dataset' is not a single logical value")
   if(!zf_testLogical(return_beta)) stop("'return_beta' is not a single logical value")
   if(return_beta) stopifnot(is.integer(N_return_beta), is.vector(N_return_beta), length(N_return_beta) == 1L, N_return_beta > 50L)
+  if(!zf_testLogical(high_quality_plots)) stop("'high_quality_plots' is not a single logical value")
   
   # 0: checking outputname & gzip_final_dataset
   if(!(is.character(outputname) & length(outputname) == 1L)) stop("'outputname' is not a valid filename")
@@ -361,8 +407,19 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
       if(header_final_dataset %in% c("original", "standard")) {
         use_outheader <- header_final_dataset
       } else {
-        if(!file.exists(header_final_dataset)) stop("'header_final_dataset' is not a standard name nor a filename in the working directory")
-        header_final_dataset <- read.table(header_final_dataset, header = F, stringsAsFactors = FALSE)
+        if(header_final_dataset %in% c("GWAMA", "PLINK", "META")) {
+          use_outheader <- header_final_dataset # temporary storage for command below
+          header_final_dataset <- data.frame(
+            GWAMA = c("MARKER", "CHR", "POSITION", "BETA", "SE", "P"),
+            PLINK = c("SNP",		"CHR", "BP",			 "BETA", "SE", "P"),
+            META =  c("rsid",   "chr", "pos",    	 "beta", "se", "P_value"),
+            QC =    c("PROBEID","CHR", "POSITION", "BETA", "SE", "P_VAL"),
+            stringsAsFactors = FALSE)
+          header_final_dataset <- header_final_dataset[ ,c(use_outheader, "QC")]
+        } else {
+          if(!file.exists(header_final_dataset)) stop("'header_final_dataset' is not a standard name nor a filename in the working directory")
+          header_final_dataset <- read.table(header_final_dataset, header = F, stringsAsFactors = FALSE)
+        }
         use_outheader <- "table"
       }
     } else {
@@ -442,7 +499,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   header_std <- c("PROBEID", "BETA", "SE", "P_VAL")
   if(use_translation){
     header_info <- translate_header(header = toupper(header_orig),
-                                    standard = header_std,
+                                    standard = c(header_std, "CHR", "POSITION"),
                                     alternative = header_translations)
     if(any(duplicated(header_info$header_h))) {
       return(zf_emergencyExit(value = outcome_QC,
@@ -552,7 +609,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
     } else {
       if(N_map < (outcome_QC$N["input"]-N_NA_ID) ) { warning(paste0((outcome_QC$N["input"] - N_NA_ID) - N_map, " entries in file ", outputname, " do not appear in the map.")) }
       
-      temp_map <- data.frame(data[, c("PROBEID", "P_VAL")],
+      temp_map <- data.frame(data[, c("PROBEID", "P_VAL")], # only takes PROBEID and P_VAL to avoid issues with existing chr/position columns
                              order = 1:outcome_QC$N["input"],
                              stringsAsFactors = FALSE)
       temp_map <- merge(temp_map, map[, c("PROBEID", "CHR", "POS")], by = "PROBEID",
@@ -563,18 +620,27 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
     }
     rm(map)
   } else { N_map <- NA }
-  
+
+  # 3: removing markers_to_exclude
+  if(use_MTE){
+    vec_remove <- data$PROBEID %in% markers_to_exclude
+    outcome_QC$N["removed_at_request"] <- sum(vec_remove)
+  } else {
+    vec_remove <- logical(outcome_QC$N["input"])
+    outcome_QC$N["removed_at_request"] <- NA
+  }
+    
   # 3: counting X & Y chr
-  vec_remove <- logical(outcome_QC$N["input"])
-  
   if(use_map){ # the use_map test is so that use_map can be disabled above
-    vec_temp <- temp_map$CHR == "X" |  temp_map$CHR == 23
+    # we di bit count probes that have already been excluded above
+    vec_temp <- ( temp_map$CHR == "X" |  temp_map$CHR == 23 ) & !vec_remove
     outcome_QC$N["chrX"] <- sum(vec_temp)
     if(outcome_QC$N["chrX"] > 0L & exclude_X) vec_remove <- vec_remove | vec_temp
     
-    vec_temp <- temp_map$CHR == "Y" |  temp_map$CHR == 24
+    vec_temp <- ( temp_map$CHR == "Y" |  temp_map$CHR == 24 ) & !vec_remove
     outcome_QC$N["chrY"] <- sum(vec_temp)
-    if(outcome_QC$N["chrY"] > 0L & exclude_Y) vec_remove <- vec_remove| vec_temp
+    if(outcome_QC$N["chrY"] > 0L & exclude_Y) vec_remove <- vec_remove | vec_temp
+    rm(vec_temp)
   } else {
     outcome_QC$N["chrX"] <- NA
     outcome_QC$N["chrY"] <- NA
@@ -584,31 +650,31 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   if(is.na(threshold_outliers[1])){
     outcome_QC$N["below_lower_limit"] <- 0L
   } else {
-    vec_temp <- data$BETA < threshold_outliers[1] & !vec_NA_beta & !vec_remove # this excludes chr X and Y, if they have been excluded
+    vec_temp <- data$BETA < threshold_outliers[1] & !vec_NA_beta & !vec_remove # this excludes any previously excluded markers
     outcome_QC$N["below_lower_limit"] <- sum(vec_temp)
     if(outcome_QC$N["below_lower_limit"] > 0L & exclude_outliers) vec_remove <- vec_remove| vec_temp
+    rm(vec_temp)
   }
   
   if(is.na(threshold_outliers[2])){
     outcome_QC$N["above_upper_limit"] <- 0L
   } else {
-    vec_temp <- data$BETA > threshold_outliers[2] & !vec_NA_beta & !vec_remove # this excludes chr X and Y and low_outliers, which don't matter
+    vec_temp <- data$BETA > threshold_outliers[2] & !vec_NA_beta & !vec_remove # this excludes  any previously excluded markers
     outcome_QC$N["above_upper_limit"] <- sum(vec_temp)
     if(outcome_QC$N["above_upper_limit"] > 0L & exclude_outliers) vec_remove <- vec_remove| vec_temp
+    rm(vec_temp)
   }
-  
-  
+
   # 3: removing extremes & X & Y
-  if(use_map | use_outliers) rm(vec_temp)
   outcome_QC$N["removed"] <- sum(vec_remove)
   
-  
+  if(use_MTE) print(paste0(outcome_QC$N["removed_at_request"], " probes specified by user excluded"), quote = FALSE)
+  if(exclude_X) print(paste0(outcome_QC$N["chrX"], " X-chromosome probes excluded"), quote = FALSE)
+  if(exclude_Y) print(paste0(outcome_QC$N["chrY"], " Y-chromosome probes excluded"), quote = FALSE)
   if(use_outliers){
     print(paste0(outcome_QC$N["below_lower_limit"] + outcome_QC$N["above_upper_limit"], " outliers ", if(exclude_outliers) "excluded" else "found"), quote = FALSE)
   }
-  if(exclude_X) print(paste0(outcome_QC$N["chrX"], " X-chromosome probes excluded"), quote = FALSE)
-  if(exclude_Y) print(paste0(outcome_QC$N["chrY"], " Y-chromosome probes excluded"), quote = FALSE)
-  if(sum(exclude_outliers, exclude_X, exclude_Y) > 1L) print(paste0(outcome_QC$N["removed"], " total probes excluded"), quote = FALSE)
+  if(sum(use_MTE, exclude_outliers, exclude_X, exclude_Y) > 1L) print(paste0(outcome_QC$N["removed"], " total probes excluded"), quote = FALSE)
   flush.console()
   
   if(outcome_QC$N["removed"] > 0L){
@@ -632,7 +698,12 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   #### Phase 4: generating plots
   
   # 4: histograms
-  png(paste0(outputname, ".histo.png"),  width = 960, height = 480, res = 108)
+  if(high_quality_plots){
+    tiff(filename = paste0(outputname, ".histo.tif"), units = "in", width = 9, height = 4.5, res = 350,
+         compression = "lzw")
+  } else {
+    png(paste0(outputname, ".histo.png"),  width = 960, height = 480, res = 108)
+  }
   par(mfrow = c(1, 2))
   
   hist(data$BETA,
@@ -649,20 +720,25 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   # 4: P correlation plot
   outcome_QC$p_cor <- P_correlation(dataset = data,
                               plot_correlation = TRUE, plot_if_threshold = FALSE, threshold_r = 0.99,
-                              save_name = outputname)
+                              high_quality_plots = high_quality_plots, save_name = outputname)
   
   # 4: Manhattan & QQ plots plot - note that we run this even if there is no map in order to calculate lamda
   outcome_QC$lambda <- EWAS_plots(dataset = if(use_map) temp_map else data$P_VAL,
                                   plot_QQ = TRUE, plot_Man = use_map, plot_cutoff_p = 0.05,
-                                  plot_QQ_bands = FALSE,
+                                  plot_QQ_bands = FALSE, high_quality_plots = high_quality_plots,
                                   save_name = outputname)
   if(use_map) rm(temp_map)
   
   
   # 4: Volcano plot - Effect/Beta op X-as, y-as = -log10 p-waarde
   temp_p <- if(N_low_p > 0L) ifelse(data$P_VAL < 1e-300, 1e-300, data$P_VAL) else data$P_VAL
-  png(paste0(outputname, ".graph_volcano.png"),
-      width = 720, height = 720, res = 144)
+  if(high_quality_plots){
+    tiff(filename = paste0(outputname, ".graph_volcano.tif"), units = "in", width = 7, height = 7, res = 350,
+         compression = "lzw")
+  } else {
+    png(paste0(outputname, ".graph_volcano.png"),
+        width = 720, height = 720, res = 144)
+  }
   plot(data$BETA, -log10(temp_p),
        main = "Volcano plot", sub = outputname, cex.sub = 1.3,
        xlab = "Effect Size", ylab = "-log10(p value)")
@@ -706,7 +782,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   write.table(data.frame(
     v1 = c("File", "QC Start Time", "QC End Time", "EWAS_QC Version"),
     v2 = "",
-    v3 = c(outcome_QC$file, zv_startime, date(), "1.0-7"),
+    v3 = c(outcome_QC$file, zv_startime, date(), "1.0-8"),
     stringsAsFactors = FALSE),
     zc_log, quote = FALSE,
     sep = "\t", row.names = FALSE, col.names = FALSE)
@@ -726,9 +802,9 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
     v2 = "",
     v3 = c(outcome_QC$N["input"], N_NA_ID, N_dupli, N_NA_beta, N_NA_SE, N_bad_SE, N_NA_p, N_bad_p, outcome_QC$N["unusable"]),
     v4 = "",
-    v5 = c("Start", "Not found in map", "Found in map", "> X", "> Y", "Outliers High", "Outliers Low", "Total Removed", "Final"),
+    v5 = c("Start", "Removed at request", "Not found in map", "> X", "> Y", "Outliers High", "Outliers Low", "Total Removed", "Final"),
     v6 = "",
-    v7 = c(outcome_QC$N["input"], outcome_QC$N["input"] - N_map, N_map, outcome_QC$N["chrX"], outcome_QC$N["chrY"], outcome_QC$N["below_lower_limit"], outcome_QC$N["above_upper_limit"], outcome_QC$N["removed"], outcome_QC$N["final"]),
+    v7 = c(outcome_QC$N["input"], outcome_QC$N["removed_at_request"], outcome_QC$N["input"] - N_map, outcome_QC$N["chrX"], outcome_QC$N["chrY"], outcome_QC$N["below_lower_limit"], outcome_QC$N["above_upper_limit"], outcome_QC$N["removed"], outcome_QC$N["final"]),
     stringsAsFactors = FALSE),
     zc_log, quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
   
@@ -798,6 +874,7 @@ EWAS_series <- function(EWAS_files, # datatable with ewas results, or filename o
                         header_translations, # translation table for file headers
                         save_final_dataset = TRUE,
                         gzip_final_dataset = TRUE,
+                        high_quality_plots = FALSE,
                         ...){
   # all other arguments will be checked by the first EWAS_QC, so no need to check 'em here
   zf_loadAndReturn <- function(filename, filedesc, ...){
@@ -838,6 +915,7 @@ EWAS_series <- function(EWAS_files, # datatable with ewas results, or filename o
   if(any(nchar(output_files) == 0L)) stop("'output_files' contains valid filename")
   if(any(duplicated(output_files))) stop("duplicate filenames in 'output_files'")
   
+  if(!zf_testLogical(save_final_dataset)) stop("'save_final_dataset' is not a single logical value")
   if(save_final_dataset){
     if(!zf_testLogical(gzip_final_dataset)) stop("'gzip_final_dataset' is not a single logical value")
     #if(!zf_testLogical(save_standard_header)) stop("'save_standard_header' is not a single logical value")
@@ -847,6 +925,7 @@ EWAS_series <- function(EWAS_files, # datatable with ewas results, or filename o
       if(any(file.exists(output_files))) stop("cannot save output: one of the specified 'output_files' already exists")
     }
   }
+  if(!zf_testLogical(high_quality_plots)) stop("'high_quality_plots' is not a single logical value")
   
   # checking N & preparing precision plot
   dat_prec <- data.frame(file = EWAS_files, no = 1:N_file,
@@ -908,6 +987,7 @@ EWAS_series <- function(EWAS_files, # datatable with ewas results, or filename o
                         outputname = output_files[ci],
                         header_translations = header_translations,
                         save_final_dataset = save_final_dataset, gzip_final_dataset = gzip_final_dataset,
+                        high_quality_plots = high_quality_plots,
                         return_beta = TRUE, N_return_beta = N_beta, ...)
     if(temp_out$QC_success){
       dat_prec$use[ci] <- TRUE
@@ -930,7 +1010,12 @@ EWAS_series <- function(EWAS_files, # datatable with ewas results, or filename o
       temp_N <- sqrt(dat_temp$N)
       temp_ticks <- pretty(temp_prec) # using pretty() will hopefully ensure neat values on both y-axes
       
-      png("EWAS_QC_graph_precision.png")
+      if(high_quality_plots){
+        tiff(filename = "EWAS_QC_graph_precision.tif", units = "in", width = 7, height = 7, res = 350,
+             compression = "lzw")
+      } else {
+        png("EWAS_QC_graph_precision.png", width = 960, height= 960, res = 144)
+      }
       par(mar = c(5, 4, 4, 4.5) + 0.1) # add +2 to right margin, so to leave space for label
       plot(x = temp_N, y = temp_prec, yaxt = "n", # suppresses the y-axis
            main = "Precision by Sample Size", xlab = "sqrt(sample size)", ylab = "Precision ( = 1 / median SE)")
@@ -941,8 +1026,6 @@ EWAS_series <- function(EWAS_files, # datatable with ewas results, or filename o
       dev.off()
       rm(temp_N, temp_prec, temp_ticks)
     }
-    
-    #mean_methylation density plot skipped
     
     #effect size boxplot
     
@@ -956,7 +1039,12 @@ EWAS_series <- function(EWAS_files, # datatable with ewas results, or filename o
                         dimnames = list(NULL, c("quantile25", "median", "quantile75")))
     for(ti in 1:ncol(dat_beta)) dat_quant[ti, ] <- quantile(dat_beta[, ti], names = FALSE, na.rm = TRUE)[2:4]
     
-    png("EWAS_QC_graph_effectsize.png", width = 400 + 80 * N_pass, height = 480)
+    if(high_quality_plots){
+      tiff(filename = "EWAS_QC_graph_effectsize.tif", units = "in", width = 6 + 1 * N_pass, height = 7, res = 350,
+           compression = "lzw")
+    } else {
+      png("EWAS_QC_graph_effectsize.png", width = 800 + 160 * N_pass, height = 960, res = 144)
+    }
     boxplot(dat_beta, names = if(use_N) paste0(dat_temp$no, ", N=", dat_temp$N) else dat_temp$no,
             las = 0, main = "Effect-size distribution")
     abline(h = c(median(dat_quant[ ,1]), median(dat_quant[ ,2]), median(dat_quant[ ,3])), lty = 3)

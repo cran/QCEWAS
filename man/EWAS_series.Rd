@@ -16,6 +16,7 @@ EWAS_series(EWAS_files,
             header_translations,
             save_final_dataset = TRUE,
             gzip_final_dataset = TRUE,
+            high_quality_plots = FALSE,
             ...)
 }
 \arguments{
@@ -53,7 +54,8 @@ EWAS_series(EWAS_files,
     \code{\link{translate_header}} for details.
 }
   \item{save_final_dataset,
-  gzip_final_dataset}{
+  gzip_final_dataset,
+  high_quality_plots}{
     logical values. See \code{\link{EWAS_QC}} for details.
 }
   \item{\dots}{
@@ -61,6 +63,12 @@ EWAS_series(EWAS_files,
 }
 }
 \details{
+ \code{QCEWAS} includes a Quick-Start guide in the doc
+  folder of the library. This guide will explain how to
+  run a QC and how to interpret the results.
+  The start-up message when loading
+  \code{QCEWAS} will indicate where it can be found on your
+  computer. In brief,
   \code{EWAS_series} works by calling \code{\link{EWAS_QC}} for
   every filename given in \code{EWAS_files}. After all files
   have been processed, it will generate two additional graphs: a
@@ -88,17 +96,16 @@ EWAS_series(EWAS_files,
   The full filenames and corresponding numbers are listed in the
   EWAS_QC_legend.txt file that is generated after \code{EWAS_series}
   completes.
-
 }
 \value{
   The main output of \code{EWAS_series} are the cleaned results
   files, logs and graphs. The function also returns an invisible
-  data frame, listing the input file names, file numbers,
+  data frame (also saved as \code{EWAS_QC_legend.txt}), listing
+  the input file names, file numbers,
   whether they passed a complete QC (note that this merely
   indicates that the QC was completed, not that there were no
   problems), the standard error and, if specified, the sample
-  size (this is the same table as was saved in
-  EWAS_QC_legend.txt).
+  size.
 }
 \seealso{
   \code{\link{EWAS_QC}}
@@ -108,10 +115,8 @@ EWAS_series(EWAS_files,
 # extdata folder of the QCEWAS library will be copied
 # to your current R working directory. Running the QC
 # generates several files in your working directory:
-# consult the manual for more information on how to
-# interpret these.
-  
-\dontrun{
+# consult the Quick-Start Guide for more information
+# on how to interpret these.
 
 file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
                            "sample_map.txt.gz"),
@@ -142,5 +147,4 @@ QC_results <- EWAS_series(EWAS_files = sample_list,
                           threshold_outliers = c(-20, 20),
                           exclude_outliers = FALSE,
                           exclude_X = TRUE, exclude_Y = FALSE)
-}
 }
