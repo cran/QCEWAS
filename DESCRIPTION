@@ -1,8 +1,8 @@
 Package: QCEWAS
 Type: Package
 Title: Fast and Easy Quality Control of EWAS Results Files
-Version: 1.0-8
-Date: 2016-10-03
+Version: 1.0-9
+Date: 2016-10-31
 Author: Peter J. van der Most,
 		Leanne K. Kupers,
 		Ilja Nolte
@@ -12,6 +12,6 @@ Description: Tools for (automated and manual) quality control of
   the results of Epigenome-Wide Association Studies.
 License: GPL (>= 3)
 NeedsCompilation: no
-Packaged: 2016-10-18 12:14:37 UTC; mostPJ
+Packaged: 2016-10-31 14:39:43 UTC; mostPJ
 Repository: CRAN
-Date/Publication: 2016-10-18 14:38:52
+Date/Publication: 2016-10-31 16:53:48

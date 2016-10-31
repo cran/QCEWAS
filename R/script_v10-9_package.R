@@ -1,4 +1,4 @@
-# QCEWAS v1.0-8
+# QCEWAS v1.0-9
 # Created by Peter van der Most, April 2015 - Oktober 2016 with samples
 # Based on code for the QCGWAS package
 
@@ -6,14 +6,12 @@
 # Remember to adjust version number here and in output log, and activate onAttach functie
 # don't export the zf_testLogical function
 
-
   .onAttach <- function(libname, pkgname) {
     packageStartupMessage("")
-    packageStartupMessage("QCEWAS library, version 1.0-8")
-    packageStartupMessage(paste0("A Quick Start Guide can be found in", system.file("doc", package = "QCEWAS")))
+    packageStartupMessage("QCEWAS library, version 1.0-9")
+    packageStartupMessage(paste0("A Quick Start Guide can be found in ", system.file("doc", package = "QCEWAS")))
     packageStartupMessage("")
   }
-
 
 # zf_testLogical is an internal function to test if arguments are logical
 zf_testLogical <- function(param, notNA = TRUE){
@@ -782,7 +780,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   write.table(data.frame(
     v1 = c("File", "QC Start Time", "QC End Time", "EWAS_QC Version"),
     v2 = "",
-    v3 = c(outcome_QC$file, zv_startime, date(), "1.0-8"),
+    v3 = c(outcome_QC$file, zv_startime, date(), "1.0-9"),
     stringsAsFactors = FALSE),
     zc_log, quote = FALSE,
     sep = "\t", row.names = FALSE, col.names = FALSE)
