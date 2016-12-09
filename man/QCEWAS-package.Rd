@@ -11,8 +11,8 @@
   \tabular{ll}{
     Package: \tab QCEWAS\cr
     Type: \tab Package\cr
-    Version: \tab 1.0-9\cr
-    Date: \tab 2016-10-31\cr
+    Version: \tab 1.1-0\cr
+    Date: \tab 2016-12-09\cr
     License: \tab GPL (>= 3)\cr
   }
   When combining the results of multiple Epigenome-Wide

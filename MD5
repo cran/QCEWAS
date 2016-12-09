@@ -1,8 +1,8 @@
-b43abb176fc331a32eb0d329d6ef6512 *DESCRIPTION
+b8c134376486d00ff8f77bc9957de01f *DESCRIPTION
 02800a2dd3ee4fe8e0a422c3644d877d *NAMESPACE
-8f2269905fa3d008a2b4fd6d473c098b *R/script_v10-9_package.R
+9e10e0ecdb1d58feb53c4dfa744ff237 *R/script_v11-0_package.R
 955bc6c4311e2ba82697cd42d6ceb94e *inst/CITATION
-4b4923d241f10fd62a7c0fdffd8efbeb *inst/doc/QCEWAS_Quick_Start_Guide_v109.docx
+97a458bb510f5cdc44b15b5efc91dec5 *inst/doc/QCEWAS_Quick_Start_Guide_v110.docx
 65b773e70a08d23c08dc1f8518fe3954 *inst/extdata/sample1.txt.gz
 8f6229be82ef62705e6e17aba602ab17 *inst/extdata/sample2.txt.gz
 378cc67aa023e5b119e9832563a7685d *inst/extdata/sample_map.txt.gz
@@ -13,5 +13,5 @@ b7152599997908bea19bcef725867867 *inst/extdata/translation_table.txt
 bcc1831547ff45ab999bb8ec8212b025 *man/EWAS_series.Rd
 e40e0c53864137c001192126be144e96 *man/P_correlation.Rd
 99f31790b60dd9d876e723d9f8132b26 *man/P_lambda.Rd
-5f9c529eb85bfb220e13e818859e6398 *man/QCEWAS-package.Rd
+e7b4dade5491bf402e1c53a8d3c1aff5 *man/QCEWAS-package.Rd
 ca2405cb227c99775d169e0fc4809fad *man/translate_header.Rd

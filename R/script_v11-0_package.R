@@ -1,17 +1,19 @@
-# QCEWAS v1.0-9
-# Created by Peter van der Most, April 2015 - Oktober 2016 with samples
+# QCEWAS v1.1-0
+# Created by Peter van der Most, April 2015 - December 2016 with samples
 # Based on code for the QCGWAS package
 
 
 # Remember to adjust version number here and in output log, and activate onAttach functie
 # don't export the zf_testLogical function
 
+
   .onAttach <- function(libname, pkgname) {
     packageStartupMessage("")
-    packageStartupMessage("QCEWAS library, version 1.0-9")
+    packageStartupMessage("QCEWAS library, version 1.1-0")
     packageStartupMessage(paste0("A Quick Start Guide can be found in ", system.file("doc", package = "QCEWAS")))
     packageStartupMessage("")
   }
+
 
 # zf_testLogical is an internal function to test if arguments are logical
 zf_testLogical <- function(param, notNA = TRUE){
@@ -138,7 +140,7 @@ EWAS_plots <- function(dataset, plot_QQ = TRUE, plot_Man = TRUE,
   
   QQ_obs_p	 <- dataset$P_VAL
   QQ_obs_short <- subset(QQ_obs_p, !is.na(QQ_obs_p))
-  QQ_obs_N	 <- length(QQ_obs_short)	# N of non-missing p's: the N of all p's is dataN
+  QQ_obs_N	 <- length(QQ_obs_short)	# N of non-missing p's
   
   if(QQ_obs_N > 10L) {
     lambda <- P_lambda(QQ_obs_short)
@@ -202,6 +204,7 @@ EWAS_plots <- function(dataset, plot_QQ = TRUE, plot_Man = TRUE,
     man_set <- dataset[!is.na(dataset$POS) & !is.na(dataset$CHR) & !is.na(dataset$P_VAL) & dataset$P_VAL <= plot_cutoff_p, c("CHR", "POS", "P_VAL")]
     
     if(!is.numeric(man_set$CHR)) {
+      if(is.factor(man_set$CHR)) { man_set$CHR <- as.character(man_set$CHR) }
       if(is.character(man_set$CHR)){
         man_set$CHR <- toupper(man_set$CHR)
         man_set$CHR[man_set$CHR == "X"] <- 23L
@@ -273,7 +276,7 @@ EWAS_plots <- function(dataset, plot_QQ = TRUE, plot_Man = TRUE,
            xlim = c(0, chr_size$start[27]), col = man_set$CHR, cex.lab = 1.8, cex.axis = 1.4,
            xlab = "Chromosome", ylab = "Observed -log10(p-value)", main = "Manhattan plot", sub = save_name, cex.sub = 1.3, col.sub = "red")
       abline(v = chr_size[2:26, 3] - 250000, lty = 2)
-      abline(h = -log10(0.05/sum(QQ_incl)),  #  -log10(5e-8),
+      abline(h = -log10(0.05/QQ_obs_N),  #  -log10(5e-8), # Bonferroni threshold
              lty = 3, col="red")
       axis(1, at = at_label, labels = man_label, cex.axis = 1.5)
       dev.off()
@@ -780,7 +783,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   write.table(data.frame(
     v1 = c("File", "QC Start Time", "QC End Time", "EWAS_QC Version"),
     v2 = "",
-    v3 = c(outcome_QC$file, zv_startime, date(), "1.0-9"),
+    v3 = c(outcome_QC$file, zv_startime, date(), "1.1-0"),
     stringsAsFactors = FALSE),
     zc_log, quote = FALSE,
     sep = "\t", row.names = FALSE, col.names = FALSE)
