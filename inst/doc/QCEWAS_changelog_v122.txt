@@ -1,0 +1,9 @@
+Changes from QCEWAS v1.1-0 to v1.2-1
+* Bug-fix for the effect-size distribution comparison plot: in v1.1-0, if N_return_beta was set to a value between 0.5 and 1 times the number of markers in the dataset (default setting is 500,000, so this would occur when QC'ing data from an EPIC 850k chip), QC_EWAS would erronously plot only markers from the left side of the beta distribution. The new version avoids this by plotting a random selection of beta values. As a conquence, the comparison plot may differ slightly when rerunning a QC over the same dataset. This is only a cosmetic issue (the default sample size is sufficiently large to include the majority of a normally-sized EWAS dataset), and can be eliminated entirely by setting the new N_plot_beta argument to a value higher than the number of markers in the dataset (so that all markers are included).
+* Added a new argument to QC_series: N_plot_beta (see above)
+* Changed the required colummnames for the map file (and the dataset used in the EWAS_plots function) to "TARGETID", "CHR" and "MAPINFO" (for basepair position) to bring it in line with the Illumina manifest format.
+* Added a Bonferonni threshold line to the Volcano plot.
+
+
+Changes from QCEWAS v1.2-1 to v1.2-2
+* Updated citation

@@ -17,6 +17,7 @@ EWAS_series(EWAS_files,
             save_final_dataset = TRUE,
             gzip_final_dataset = TRUE,
             high_quality_plots = FALSE,
+            N_plot_beta = 500000L,
             ...)
 }
 \arguments{
@@ -58,6 +59,12 @@ EWAS_series(EWAS_files,
   high_quality_plots}{
     logical values. See \code{\link{EWAS_QC}} for details.
 }
+  \item{N_plot_beta}{
+    integer specifying how many beta values per file should
+    be used in the effect-size comparison plot. Set this to
+    a value larger than the number of markers in the datasets
+    to include all markers.
+}
   \item{\dots}{
     arguments passed to \code{\link{EWAS_QC}}.
 }
@@ -91,6 +98,16 @@ EWAS_series(EWAS_files,
   distribution to become somewhat narrower as sample size
   increases. However, large differences in scale suggest that
   the files used different units for their measurements.
+  
+  As of version 1.2-0, the effect-size distribution plot shows
+  a random (rather than proportional) selection of effect-sizes
+  from the cohort. As a consequence, rerunning QC over a
+  dataset may result in a slightly different distribution plot
+  in each run. This is only a cosmetic issue (as the default
+  sample size is sufficiently large to include the majority of a
+  normally-sized EWAS dataset) and can be averted entirely by
+  changing the \code{N_plot_beta} argument to a value exceeding
+  the number of markers in the dataset(s).
 
   Both plots use numbers rather than names to identify files.
   The full filenames and corresponding numbers are listed in the

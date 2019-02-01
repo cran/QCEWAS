@@ -32,16 +32,16 @@ P_lambda(p)
   - so the presence of a few significant results (i.e. p-values
   that do not follow the normal distribution) does not bias it.
   
-  However, if lambda is 1.1 or higher, it means that a
+  However, if lambda is 2 or higher, it means that a
   substantial portion of your dataset is more significant than
-  expected for a genome-wide study (this is called
+  expected for a genome-wide study (i.e.
   oversignificance). This could mean your dataset has been
   filtered for low-significance markers. If this is not
   the case, you should consider doing a genomic control
   correction on the p-values, to correct the oversignificance.
   
   Similary,
-  values of 0.9 or lower indicate that your results are less
+  values of 0.8 or lower indicate that your results are less
   significant than would be expected from a random distribution
   of p-values.
 }

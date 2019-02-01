@@ -1,5 +1,5 @@
-# QCEWAS v1.1-0
-# Created by Peter van der Most, April 2015 - December 2016 with samples
+# QCEWAS v1.2-2
+# Created by Peter van der Most, April 2015 - December 2016 with samples, updated August 2018, and some administrative changed in Februari 2019
 # Based on code for the QCGWAS package
 
 
@@ -9,7 +9,7 @@
 
   .onAttach <- function(libname, pkgname) {
     packageStartupMessage("")
-    packageStartupMessage("QCEWAS library, version 1.1-0")
+    packageStartupMessage("QCEWAS library, version 1.2-2")
     packageStartupMessage(paste0("A Quick Start Guide can be found in ", system.file("doc", package = "QCEWAS")))
     packageStartupMessage("")
   }
@@ -109,7 +109,7 @@ EWAS_plots <- function(dataset, plot_QQ = TRUE, plot_Man = TRUE,
     }
   }
   colnames(dataset) <- toupper(colnames(dataset))
-  header_std <- c("P_VAL", "CHR", "POS")[c(TRUE, plot_Man, plot_Man)]
+  header_std <- c("P_VAL", "CHR", "MAPINFO")[c(TRUE, plot_Man, plot_Man)]
   
   if(missing(header_translations)) {
     header_missing <- header_std[!header_std %in% colnames(dataset)]
@@ -194,14 +194,16 @@ EWAS_plots <- function(dataset, plot_QQ = TRUE, plot_Man = TRUE,
     points(QQ_exp_short, QQ_obs_short, pch = 1, col = "black")
     abline(0,1)
     text(0, 0.98 * QQ_obs_max, substitute(paste(lambda, " = ", x), list(x=round(lambda, digits = 3))),
-         pos = 4, col = ifelse(lambda > 1.5, "red", "black"))
+         pos = 4, col = ifelse(lambda > 2 | lambda < 0.8, "red", "black"))
+    #abline(h = -log10(0.05/QQ_obs_N),  #  -log10(5e-8), # Bonferroni threshold
+    #       lty = 3, col="red")
     dev.off()
   } else { if(plot_QQ) warning("Insufficient significant p-values to create QQ plot") }
   
   # Stage 3: creating Manhattan plot
   if(plot_Man & sum(QQ_incl) > 10L ) {
     
-    man_set <- dataset[!is.na(dataset$POS) & !is.na(dataset$CHR) & !is.na(dataset$P_VAL) & dataset$P_VAL <= plot_cutoff_p, c("CHR", "POS", "P_VAL")]
+    man_set <- dataset[!is.na(dataset$MAPINFO) & !is.na(dataset$CHR) & !is.na(dataset$P_VAL) & dataset$P_VAL <= plot_cutoff_p, c("CHR", "MAPINFO", "P_VAL")]
     
     if(!is.numeric(man_set$CHR)) {
       if(is.factor(man_set$CHR)) { man_set$CHR <- as.character(man_set$CHR) }
@@ -232,7 +234,7 @@ EWAS_plots <- function(dataset, plot_QQ = TRUE, plot_Man = TRUE,
                              start= c(	 500000, 248249719, 491700868, 691702695, 883475758, 1064833624, 1236233616, 1395555040, 1542329866, 1683103118, 1818977855, 1953930239, 2086779773, 2201422753, 2308291338, 2409130253, 2498457507, 2577732249, 2654349402, 2718661053, 2781597017, 2829041340, 2879232772, 3034646526, NA, NA, NA))
       
       new_pos <- integer(length = manhattanN)
-      for (mi in 1:24 ) new_pos <- ifelse(man_set$CHR==chr_size$chromosome[mi], chr_size[mi, 3] + man_set$POS, new_pos)
+      for (mi in 1:24 ) new_pos <- ifelse(man_set$CHR==chr_size$chromosome[mi], chr_size[mi, 3] + man_set$MAPINFO, new_pos)
       
       use_Y	<- any(man_set$CHR == 24L)
       use_XY <- any(man_set$CHR == 25L)
@@ -249,14 +251,14 @@ EWAS_plots <- function(dataset, plot_QQ = TRUE, plot_Man = TRUE,
       if(use_XY) {
         man_label <- c(man_label, "XY")
         at_label <- c(at_label, chr_size$start[26] - 250000 - ( chr_size$start[26] - chr_size$start[25] ) / 2)
-        chr_size$size[25] <- max(man_set$POS[man_set$CHR == 25])
+        chr_size$size[25] <- max(man_set$MAPINFO[man_set$CHR == 25])
         chr_size$start[26] <- chr_size$start[25] + chr_size$size[25] + 500000
       } else { chr_size$start[26] <- chr_size$start[25] }
       
       if(use_M ) {
         man_label <- c(man_label, "M")
         at_label <- c(at_label, chr_size$start[27] - 250000 - ( chr_size$start[27] - chr_size$start[26] ) / 2)
-        chr_size$size[26] <- max(man_set$POS[man_set$CHR == 26])
+        chr_size$size[26] <- max(man_set$MAPINFO[man_set$CHR == 26])
         chr_size$start[27] <- chr_size$start[26] + chr_size$size[26] + 500000
       } else { chr_size$start[27] <- chr_size$start[26] }
       
@@ -472,15 +474,15 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
     
     colnames(map) <- toupper(colnames(map))
     
-    if(!all(c("PROBEID", "CHR", "POS") %in% colnames(map))) {
+    if(!all(c("TARGETID", "CHR", "MAPINFO") %in% colnames(map))) {
       stop(paste0("map does not have columns:  ",
-                  paste0(c("PROBEID", "CHR", "POS")[!c("PROBEID", "CHR", "POS") %in% colnames(map)],
+                  paste0(c("TARGETID", "CHR", "MAPINFO")[!c("TARGETID", "CHR", "MAPINFO") %in% colnames(map)],
                          collapse = ", ")))
     }
     # We cannot allow duplicate or missing probeIDs to be present in map,
     # because otherwise temp_map won't be of equal length to data.
-    if(any(is.na(map$PROBEID))) stop("'map' contains missing probeIDs")
-    if(any(duplicated(map$PROBEID))) stop("'map' contains duplicate probeIDs")
+    if(any(is.na(map$TARGETID))) stop("'map' contains missing TargetIDs")
+    if(any(duplicated(map$TARGETID))) stop("'map' contains duplicate TargetIDs")
   }
   
   # 1: data
@@ -601,7 +603,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   # generate matching map for use in Manhattan plot
 
   if(use_map) {
-    N_map <- sum(data$PROBEID %in% map$PROBEID)
+    N_map <- sum(data$PROBEID %in% map$TARGETID)
     if(N_map == 0L){
       use_map <- FALSE
       exclude_X <- FALSE
@@ -613,7 +615,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
       temp_map <- data.frame(data[, c("PROBEID", "P_VAL")], # only takes PROBEID and P_VAL to avoid issues with existing chr/position columns
                              order = 1:outcome_QC$N["input"],
                              stringsAsFactors = FALSE)
-      temp_map <- merge(temp_map, map[, c("PROBEID", "CHR", "POS")], by = "PROBEID",
+      temp_map <- merge(temp_map, map[, c("TARGETID", "CHR", "MAPINFO")], by.x = "PROBEID", by.y = "TARGETID",
                         all.x = TRUE, all.y = FALSE, sort = FALSE)
       temp_map <- temp_map[order(temp_map$order), -3]
       if(!all(temp_map$PROBEID == data$PROBEID)) stop("DEBUG ERROR - temp_map does not match data-probeIDs")
@@ -733,6 +735,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   
   # 4: Volcano plot - Effect/Beta op X-as, y-as = -log10 p-waarde
   temp_p <- if(N_low_p > 0L) ifelse(data$P_VAL < 1e-300, 1e-300, data$P_VAL) else data$P_VAL
+  temp_bonf <- 0.05/sum(!is.na(temp_p))
   if(high_quality_plots){
     tiff(filename = paste0(outputname, ".graph_volcano.tif"), units = "in", width = 7, height = 7, res = 350,
          compression = "lzw")
@@ -743,6 +746,10 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   plot(data$BETA, -log10(temp_p),
        main = "Volcano plot", sub = outputname, cex.sub = 1.3,
        xlab = "Effect Size", ylab = "-log10(p value)")
+  if(min(temp_p, na.rm = T) < temp_bonf){
+    abline(h = -log10(temp_bonf),  #  -log10(5e-8), # Bonferroni threshold
+           lty = 3, col="red")
+  }
   dev.off()
   rm(temp_p)
   
@@ -761,7 +768,8 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
     if(N_final_beta < N_return_beta) {
       outcome_QC$effect_size <- c(data$BETA[!vec_NA_beta], rep(NA, N_return_beta - N_final_beta))
     } else {
-      outcome_QC$effect_size <- sort(data$BETA[!vec_NA_beta])[c(1:N_return_beta)*(N_final_beta %/% N_return_beta)]
+      #outcome_QC$effect_size <- sort(data$BETA[!vec_NA_beta])[c(1:N_return_beta)*(N_final_beta %/% N_return_beta)]
+      outcome_QC$effect_size <- sort(sample(x = data$BETA[!vec_NA_beta], size = N_return_beta, replace = FALSE))
     }
   }
   outcome_QC$QC_success <- TRUE
@@ -783,7 +791,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   write.table(data.frame(
     v1 = c("File", "QC Start Time", "QC End Time", "EWAS_QC Version"),
     v2 = "",
-    v3 = c(outcome_QC$file, zv_startime, date(), "1.1-0"),
+    v3 = c(outcome_QC$file, zv_startime, date(), "1.2-2"),
     stringsAsFactors = FALSE),
     zc_log, quote = FALSE,
     sep = "\t", row.names = FALSE, col.names = FALSE)
@@ -876,6 +884,7 @@ EWAS_series <- function(EWAS_files, # datatable with ewas results, or filename o
                         save_final_dataset = TRUE,
                         gzip_final_dataset = TRUE,
                         high_quality_plots = FALSE,
+                        N_plot_beta = 500000L,
                         ...){
   # all other arguments will be checked by the first EWAS_QC, so no need to check 'em here
   zf_loadAndReturn <- function(filename, filedesc, ...){
@@ -895,6 +904,14 @@ EWAS_series <- function(EWAS_files, # datatable with ewas results, or filename o
   if(use_translation) { use_translation <- !is.null(header_translations) }
   use_N <- !missing(N)
   if(use_N) { use_N <- !is.null(N) }
+  
+  # Checking N_plot_beta
+  if(is.numeric(N_plot_beta)) {
+    if(as.integer(N_plot_beta) == N_plot_beta){
+      N_plot_beta <- as.integer(N_plot_beta)
+    } else stop("'N_plot_beta' is not an integer")
+  }
+  stopifnot(is.integer(N_plot_beta), is.vector(N_plot_beta), length(N_plot_beta) == 1L, N_plot_beta > 50L)
   
   # checking input & output filenames, as well as save commands
   stopifnot(is.vector(EWAS_files), is.character(EWAS_files))
@@ -964,22 +981,22 @@ EWAS_series <- function(EWAS_files, # datatable with ewas results, or filename o
     #if(!is.data.frame(map)) stop("'map' is not a dataframe or a filename leading to such")
     
     colnames(map) <- toupper(colnames(map))
-    if(!all(c("PROBEID", "CHR", "POS") %in% colnames(map))) {
+    if(!all(c("TARGETID", "CHR", "MAPINFO") %in% colnames(map))) {
       stop(paste0("map does not have columns:  ",
-                  paste0(c("PROBEID", "CHR", "POS")[!c("PROBEID", "CHR", "POS") %in% colnames(map)],
+                  paste0(c("TARGETID", "CHR", "MAPINFO")[!c("TARGETID", "CHR", "MAPINFO") %in% colnames(map)],
                          collapse = ", ")))
     }
-    # We cannot allow duplicate or missing probeIDs to be present in map,
+    # We cannot allow duplicate or missing TargetIDs to be present in map,
     # because otherwise temp_map won't be of equal length to data.
-    if(any(is.na(map$PROBEID))) stop("'map' contains missing probeIDs")
-    if(any(duplicated(map$PROBEID))) stop("'map' contains duplicate probeIDs")
+    if(any(is.na(map$TARGETID))) stop("'map' contains missing TargetIDs")
+    if(any(duplicated(map$TARGETID))) stop("'map' contains duplicate TargetIDs")
   } else { map <- NULL }
   
   
   #### Starting the actual QC
   
-  N_beta <- 500000L
-  dat_beta <- matrix(data = numeric(N_beta * N_file), nrow = N_beta, ncol = N_file)
+  #N_beta <- 500000L
+  dat_beta <- matrix(data = numeric(N_plot_beta * N_file), nrow = N_plot_beta, ncol = N_file)
   for(ci in 1:N_file){
     #print(paste0(" *** QC'ing file ", ci, " of ", N_file), quote = FALSE)
     #flush.console() # unnecessary as EWAS_QC will already flush
@@ -989,7 +1006,7 @@ EWAS_series <- function(EWAS_files, # datatable with ewas results, or filename o
                         header_translations = header_translations,
                         save_final_dataset = save_final_dataset, gzip_final_dataset = gzip_final_dataset,
                         high_quality_plots = high_quality_plots,
-                        return_beta = TRUE, N_return_beta = N_beta, ...)
+                        return_beta = TRUE, N_return_beta = N_plot_beta, ...)
     if(temp_out$QC_success){
       dat_prec$use[ci] <- TRUE
       dat_prec$SE[ci] <- temp_out$SE_median

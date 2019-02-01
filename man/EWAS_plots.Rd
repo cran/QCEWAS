@@ -21,11 +21,11 @@
 \arguments{
   \item{dataset}{
     either a vector of p-values, or a data frame containing the
-    columns \code{CHR} (chromosome number), \code{POS}
+    columns \code{CHR} (chromosome number), \code{MAPINFO}
     (base-pair position), and \code{P_VAL} (p-value). If
     different columnnames are used, the
     \code{header_translations} argument can be used to translate
-    these. \code{CHR} and \code{POS} are only required for
+    these. \code{CHR} and \code{MAPINFO} are only required for
     generating a Manhattan plot. Note that, unlike
     \code{EWAS_QC}, this function does not accept filenames,
     only data frames or vectors.

@@ -48,8 +48,8 @@
     probes, or the name of a file containing the same. This
     argument is optional: if no map is specified,
     \code{EWAS_QC} will skip the Manhattan plot and chromosome
-    filters. \code{map}	must include the columns \code{PROBEID},
-    \code{CHR} (chromosome), and \code{POS} (position), using
+    filters. \code{map}	must include the columns \code{TARGETID},
+    \code{CHR} (chromosome), and \code{MAPINFO} (position), using
     those exact names. Other columns may be included but will be
     ignored. If a filename is entered in this argument, it
     will be imported via the \code{\link{read.table}} function.
@@ -215,7 +215,7 @@
   has not been implemented yet.}
   \item{effect_size}{if \code{return_beta} is \code{TRUE}, this
   is a numeric vector of length \code{N_return_beta},
-  containing a representative selection of effect sizes from the
+  containing a random selection of effect sizes from the
   filtered dataset. If \code{FALSE}, this will be \code{NULL}.}
 }
 \note{
