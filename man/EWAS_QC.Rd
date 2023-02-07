@@ -240,7 +240,7 @@
 # a cleaned, post-QC dataset, a log file, and 5 graphs.
 # Consult the Quick-Start guide for more information on
 # how to interpret these.
-
+\dontrun{
 file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
                            "sample_map.txt.gz"),
           to = getwd(), overwrite = FALSE, recursive = FALSE)
@@ -255,5 +255,5 @@ QC_results <- EWAS_QC(data = "sample1.txt.gz",
                       exclude_outliers = FALSE,
                       exclude_X = TRUE, exclude_Y = FALSE,
                       save_final_dataset = TRUE, gzip_final_dataset = FALSE)
-
+}
 }

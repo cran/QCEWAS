@@ -1,5 +1,6 @@
-# QCEWAS v1.2-2
-# Created by Peter van der Most, April 2015 - December 2016 with samples, updated August 2018, and some administrative changed in Februari 2019
+# QCEWAS v1.2-3
+# Created by Peter van der Most, April 2015
+# Updated December 2016, August 2018, February 2019, January-February 2023
 # Based on code for the QCGWAS package
 
 
@@ -9,7 +10,7 @@
 
   .onAttach <- function(libname, pkgname) {
     packageStartupMessage("")
-    packageStartupMessage("QCEWAS library, version 1.2-2")
+    packageStartupMessage("QCEWAS library, version 1.2-3")
     packageStartupMessage(paste0("A Quick Start Guide can be found in ", system.file("doc", package = "QCEWAS")))
     packageStartupMessage("")
   }
@@ -490,7 +491,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
     if(!file.exists(data)) stop(paste0("Cannot find file: ", data))
     outcome_QC$data_input <- data
     data <- try(read.table(data, header = T, stringsAsFactors = FALSE, ...))
-    if(class(data) == "try-error") return(zf_emergencyExit(value = outcome_QC,
+    if(is(data, "try-error")) return(zf_emergencyExit(value = outcome_QC,
                                                            message = paste0("cannot load file ", outcome_QC$data_input, "; check warnings() for details")))
   } else { outcome_QC$data_input <- "user-supplied table" }
   if(!is.data.frame(data)) stop("'data' is not a dataframe or a filename leading to such")
@@ -791,7 +792,7 @@ EWAS_QC <- function(data, # datatable with ewas results, or filename of the same
   write.table(data.frame(
     v1 = c("File", "QC Start Time", "QC End Time", "EWAS_QC Version"),
     v2 = "",
-    v3 = c(outcome_QC$file, zv_startime, date(), "1.2-2"),
+    v3 = c(outcome_QC$file, zv_startime, date(), "1.2-3"),
     stringsAsFactors = FALSE),
     zc_log, quote = FALSE,
     sep = "\t", row.names = FALSE, col.names = FALSE)

@@ -7,3 +7,8 @@ Changes from QCEWAS v1.1-0 to v1.2-1
 
 Changes from QCEWAS v1.2-1 to v1.2-2
 * Updated citation
+
+
+Changes from QCEWAS v1.2-2 to v1.2-3
+* Added a section to the quick start guide on how to generate a map file
+* Minor change to the code to make it compliant with R-4

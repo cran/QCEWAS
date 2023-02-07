@@ -134,7 +134,7 @@ EWAS_series(EWAS_files,
 # generates several files in your working directory:
 # consult the Quick-Start Guide for more information
 # on how to interpret these.
-
+\dontrun{
 file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
                            "sample_map.txt.gz"),
           to = getwd(), overwrite = FALSE, recursive = FALSE)
@@ -164,4 +164,5 @@ QC_results <- EWAS_series(EWAS_files = sample_list,
                           threshold_outliers = c(-20, 20),
                           exclude_outliers = FALSE,
                           exclude_X = TRUE, exclude_Y = FALSE)
+}
 }

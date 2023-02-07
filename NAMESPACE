@@ -5,3 +5,4 @@ importFrom(stats, cor, median, pchisq, ppoints, qbeta,
 importFrom(grDevices, dev.off, palette, png, tiff)
 importFrom(graphics, abline, axis, boxplot, hist, lines,
            mtext, par, plot, points, polygon, text)
+importFrom(methods, is)

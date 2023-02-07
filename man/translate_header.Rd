@@ -60,7 +60,7 @@
 # For use in this example, the 2 sample files in the
 # extdata folder of the QCEWAS library will be copied
 # to your current R working directory
-
+\dontrun{
 file.copy(from = file.path(system.file("extdata", package = "QCEWAS"),
                            "sample2.txt.gz"),
           to = getwd(), overwrite = FALSE, recursive = FALSE)
@@ -82,5 +82,5 @@ sample_translation
 colnames(sample_ewas) <- sample_translation$header_h
 
 colnames(sample_ewas)
-
+}
 }
